@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Pokemon = require('./models/Pokemon');
 const Trainer = require('./models/Trainer');
+const path = require('path');
 require('dotenv').config();
 const cors = require('cors'); // Add this
 
@@ -12,6 +13,11 @@ app.use(express.json()); // This allows the server to read JSON data
 
 app.get('/', (req, res) => {
     res.send('<h1>Welcome to Wyatt\'s Pokemon API!</h1><p>Try /pokemon to see the data.</p>');
+});
+
+// This tells Express to serve your index.html file when someone visits the main link
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // This block MUST be here for the message to show up
