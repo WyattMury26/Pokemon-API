@@ -169,7 +169,8 @@ app.delete('/api/v1/pokemon/:name', async (req, res) => {
 
 // --- SERVER START ---
 // Note: You need mongoose.connect() here for this to actually save data!
+const PORT = process.env.PORT || 10000; // Use Render's port OR 10000 as a backup
+
 app.listen(PORT, () => {
     console.log(`🚀 API is live at http://localhost:${PORT}`);
-    console.log(`✅ Database connection status: Active`);
 });
