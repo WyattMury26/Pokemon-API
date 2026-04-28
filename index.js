@@ -10,9 +10,6 @@ const app = express();
 // --- MIDDLEWARE ---
 app.use(express.json()); // This allows the server to read JSON data
 
-// --- DATABASE CONNECTION ---
-mongoose.connect(process.env.MONGO_URI)
-
 // This block MUST be here for the message to show up
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas!"))
