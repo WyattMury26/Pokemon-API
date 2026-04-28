@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 // --- POKEMON ROUTES ---
 
 // Search all pokemon
-app.get('/api/v1/pokemon', async (req, res) => {
+app.get('/api/v1/pokemon', auth, async (req, res) => {
   try {
     const allPokemon = await Pokemon.find();
     res.json(allPokemon);
@@ -43,32 +43,40 @@ app.get('/api/v1/pokemon', async (req, res) => {
   }
 });
 
-// Search for Pokemon by type or stats
-app.get('/api/v1/search', async (req, res) => {
-  try {
-    const { type, minAttack } = req.query;
-    let query = {};
-    if (type) query.types = type;
-    if (minAttack) query['base_stats.attack'] = { $gte: minAttack };
+// Search for Pokemon by type or stats (Secured)
+app.get('/api/v1/search', auth, async (req, res) => { // 1. Added 'auth' bouncer
+    try {
+        const { type, minAttack } = req.query;
+        let query = {};
+        
+        // 2. This is the "Privacy Lock"
+        // It ensures the search ONLY looks at the logged-in user's team
+        query.user = req.user.id; 
 
-    const results = await Pokemon.find(query);
-    res.json(results);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+        if (type) query.types = type;
+        if (minAttack) query['base_stats.attack'] = { $gte: minAttack };
+
+        const results = await Pokemon.find(query);
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
-// Get a specific Pokemon by name
+// Get a specific Pokemon by name (Secured)
+// 1. ADD 'auth' HERE ->
 app.get('/api/v1/pokemon/:name', auth, async (req, res) => {
-  try {
-    const pokemon = await Pokemon.findOne({ 
-      name: { $regex: new RegExp("^" + req.params.name + "$", "i") } 
-    });
-    if (!pokemon) return res.status(404).json({ message: "Pokémon not found" });
-    res.json(pokemon);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    try {
+        const pokemon = await Pokemon.findOne({ 
+            name: { $regex: new RegExp("^" + req.params.name + "$", "i") },
+            user: req.user.id // 2. ADD THIS LINE HERE
+        });
+
+        if (!pokemon) return res.status(404).json({ message: "Pokémon not found" });
+        res.json(pokemon);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
 });
 
 // Create a new Pokemon
