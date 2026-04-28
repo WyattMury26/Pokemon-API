@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const auth = require('./middleware/auth');
 require('dotenv').config();
 
 // Import Models
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors()); // Allows your HTML to talk to the API
 app.use(express.json()); // Allows the server to read JSON
 app.use(express.static(__dirname)); // Serves your CSS/Images from the main folder
+app.use('/api/v1/auth', require('./routes/auth'));
 
 // Define the Port (Important for Render!)
 const PORT = process.env.PORT || 10000;
@@ -57,7 +59,7 @@ app.get('/api/v1/search', async (req, res) => {
 });
 
 // Get a specific Pokemon by name
-app.get('/api/v1/pokemon/:name', async (req, res) => {
+app.get('/api/v1/pokemon/:name', auth, async (req, res) => {
   try {
     const pokemon = await Pokemon.findOne({ 
       name: { $regex: new RegExp("^" + req.params.name + "$", "i") } 
@@ -70,7 +72,7 @@ app.get('/api/v1/pokemon/:name', async (req, res) => {
 });
 
 // Create a new Pokemon
-app.post('/api/v1/pokemon', async (req, res) => {
+app.post('/api/v1/pokemon', auth, async (req, res) => {
   try {
     const newPokemon = new Pokemon(req.body);
     const savedPokemon = await newPokemon.save();

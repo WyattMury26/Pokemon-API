@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const auth = require('../middleware/auth');
 
 const pokemonSchema = new mongoose.Schema({
     id: Number,
