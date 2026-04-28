@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Pokémon Collection</title>
+    <title>Your Pokémon Collection</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; text-align: center; }
         .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px; }
+        
+        /* Login Box Styling */
+        #auth-container { 
+            background: #2d2d2d; max-width: 300px; margin: 50px auto; 
+            padding: 30px; border-radius: 15px; border: 2px solid #ffcb05;
+        }
+        input { display: block; width: 90%; margin: 10px auto; padding: 10px; border-radius: 5px; border: none; }
+        button { background: #ffcb05; color: #1a1a1a; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
         .card { 
             background: #2d2d2d; border-radius: 20px; padding: 20px; width: 220px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: transform 0.3s;
@@ -21,46 +30,86 @@
 </head>
 <body>
     <h1>🔥 My Pokémon Team 🔥</h1>
+
+    <div id="auth-container" style="display: none;">
+        <h2>Trainer Login</h2>
+        <input type="email" id="login-email" placeholder="Email (expertaceftw@gmail.com)">
+        <input type="password" id="login-password" placeholder="Password">
+        <button onclick="handleLogin()">Login</button>
+        <p id="login-error" style="color: #ef5350; font-size: 0.8em;"></p>
+    </div>
+
     <div class="container" id="pokedex"></div>
 
     <script>
-        async function loadPokemon() {
-    // 1. Grab the token you saved in Thunder Client (we'll simulate this)
-    const token = localStorage.getItem('token'); 
+        // FUNCTION: Handle the Login process
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDisplay = document.getElementById('login-error');
 
-    // 2. Add headers to the fetch call
-    const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-auth-token': token // This is the crucial line!
+            try {
+                const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token); // Save the VIP pass!
+                    checkAuth(); // Refresh the page view
+                } else {
+                    errorDisplay.innerText = data.msg || "Login Failed";
+                }
+            } catch (err) {
+                errorDisplay.innerText = "Connection error...";
+            }
         }
-    });
 
-    // Check if the response is unauthorized
-    if (response.status === 401 || response.status === 400) {
-        document.getElementById('pokedex').innerHTML = "<h3>Please log in to view your team.</h3>";
-        return;
-    }
+        // FUNCTION: Load the Pokémon cards
+        async function loadPokemon() {
+            const token = localStorage.getItem('token'); 
+            const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
+                headers: { 'x-auth-token': token }
+            });
 
-    const data = await response.json();
-    const container = document.getElementById('pokedex');
-    container.innerHTML = ""; // Clear it first
+            if (!response.ok) return;
 
-    data.forEach(p => {
-        container.innerHTML += `
-            <div class="card">
-                <img src="${p.sprite}" alt="${p.name}">
-                <h2>${p.name}</h2>
-                <p><span class="type">${p.types[0]}</span></p>
-                <div class="stats">
-                    <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
-                </div>
-            </div>
-        `;
-    });
-}
-        loadPokemon();
+            const data = await response.json();
+            const container = document.getElementById('pokedex');
+            container.innerHTML = ""; 
+
+            data.forEach(p => {
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${p.sprite}" alt="${p.name}">
+                        <h2>${p.name}</h2>
+                        <p><span class="type">${p.types[0]}</span></p>
+                        <div class="stats">
+                            <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // FUNCTION: Check if user is logged in on page load
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('pokedex').style.display = 'flex';
+                loadPokemon();
+            } else {
+                document.getElementById('auth-container').style.display = 'block';
+                document.getElementById('pokedex').style.display = 'none';
+            }
+        }
+
+        // Run the check as soon as the page loads
+        checkAuth();
     </script>
 </body>
 </html>
