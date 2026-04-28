@@ -73,13 +73,21 @@ app.get('/api/v1/pokemon/:name', auth, async (req, res) => {
 
 // Create a new Pokemon
 app.post('/api/v1/pokemon', auth, async (req, res) => {
-  try {
-    const newPokemon = new Pokemon(req.body);
-    const savedPokemon = await newPokemon.save();
-    res.status(201).json(savedPokemon);
-  } catch (err) {
-    res.status(400).json({ message: "Error creating Pokémon", error: err.message });
-  }
+    try {
+        // --- THIS IS THE CRUCIAL PART ---
+        // Instead of just using (req.body), we 'spread' it (...)
+        // and manually insert the User ID from the token!
+        const newPokemon = new Pokemon({
+            ...req.body,       // Name, Types, Sprite, etc., from Thunder Client
+            user: req.user.id  // This tags the Pokemon with your ID from the bouncer (auth middleware)
+        });
+        // --------------------------------
+
+        const savedPokemon = await newPokemon.save();
+        res.status(201).json(savedPokemon);
+    } catch (err) {
+        res.status(400).json({ message: "Error creating Pokémon", error: err.message });
+    }
 });
 
 // --- SERVER START ---

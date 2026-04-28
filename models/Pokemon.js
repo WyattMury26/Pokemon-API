@@ -12,12 +12,17 @@ const pokemonSchema = new mongoose.Schema({
         defense: Number
     },
     sprite: String,
-    isCaught: Boolean,
+    isCaught: { type: Boolean, default: true},
 
       user: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'User', 
       required: true 
+    },
+    
+    capturedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
