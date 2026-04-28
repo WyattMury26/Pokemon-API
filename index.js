@@ -4,7 +4,6 @@ const Pokemon = require('./models/Pokemon');
 const Trainer = require('./models/Trainer');
 require('dotenv').config();
 const cors = require('cors'); // Add this
-const PORT = process.env.PORT || 3000;
 
 const app = express();
 
