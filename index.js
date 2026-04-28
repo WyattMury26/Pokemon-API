@@ -14,7 +14,7 @@ app.use(express.json()); // This allows the server to read JSON data
 mongoose.connect(process.env.MONGO_URI)
 
 // This block MUST be here for the message to show up
-mongoose.connect(dbURI)
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas!"))
   .catch((err) => console.log("❌ Database connection error:", err));
 
