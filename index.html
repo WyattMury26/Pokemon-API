@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pokémon Collection</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; text-align: center; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 40px; }
+        .card { 
+            background: #2d2d2d; border-radius: 20px; padding: 20px; width: 220px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: transform 0.3s;
+            border: 2px solid #ef5350;
+        }
+        .card:hover { transform: translateY(-10px); }
+        .card img { width: 120px; height: 120px; background: #3d3d3d; border-radius: 50%; }
+        h2 { color: #ffcb05; margin: 10px 0; }
+        .stats { font-size: 0.9em; color: #bdc3c7; }
+        .type { background: #ef5350; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <h1>🔥 My Pokémon Team 🔥</h1>
+    <div class="container" id="pokedex"></div>
+
+    <script>
+        async function loadPokemon() {
+            const response = await fetch('http://localhost:3000/api/v1/search');
+            const data = await response.json();
+            const container = document.getElementById('pokedex');
+
+            data.forEach(p => {
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${p.sprite}" alt="${p.name}">
+                        <h2>${p.name}</h2>
+                        <p><span class="type">${p.types[0]}</span></p>
+                        <div class="stats">
+                            <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        loadPokemon();
+    </script>
+</body>
+</html>
