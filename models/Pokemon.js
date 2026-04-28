@@ -11,7 +11,13 @@ const pokemonSchema = new mongoose.Schema({
         defense: Number
     },
     sprite: String,
-    isCaught: Boolean
+    isCaught: Boolean,
+
+      user: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User', 
+      required: true 
+    }
 });
 
 module.exports = mongoose.model('Pokemon', pokemonSchema);
