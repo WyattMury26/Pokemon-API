@@ -10,6 +10,10 @@ const app = express();
 // --- MIDDLEWARE ---
 app.use(express.json()); // This allows the server to read JSON data
 
+app.get('/', (req, res) => {
+    res.send('<h1>Welcome to Wyatt\'s Pokemon API!</h1><p>Try /pokemon to see the data.</p>');
+});
+
 // This block MUST be here for the message to show up
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas!"))
