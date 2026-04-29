@@ -176,17 +176,18 @@
             container.innerHTML = ""; 
 
             data.forEach(p => {
-                container.innerHTML += `
-                    <div class="card">
-                        <img src="${p.sprite}" alt="${p.name}">
-                        <h2>${p.name}</h2>
-                        <p><span class="type">${p.types[0]}</span></p>
-                        <div class="stats">
-                            <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
-                        </div>
-                    </div>
-                `;
-            });
+    container.innerHTML += `
+        <div class="card">
+            <img src="${p.sprite}" alt="${p.name}">
+            <h2>${p.name}</h2>
+            <p><span class="type">${p.types[0]}</span></p>
+            <div class="stats">
+                <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
+            </div>
+            <button onclick="releasePokemon('${p._id}')" style="background: transparent; color: #ef5350; border: 1px solid #ef5350; margin-top: 10px; width: 100%;">Release</button>
+        </div>
+    `;
+});
         }
 
         // FUNCTION: Check Auth and Toggle UI
