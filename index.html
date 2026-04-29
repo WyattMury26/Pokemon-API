@@ -118,22 +118,28 @@
             const token = localStorage.getItem('token');
             const logoutBtn = document.getElementById('logout-btn');
             const leagueBtn = document.getElementById('league-btn');
-            const plusBtn = document.getElementById('toggle-catch-btn');
+            const plusBtn = document.getElementById('toggle-catch-btn'); // Step 3: Define the button
 
             if (token) {
                 document.getElementById('auth-container').style.display = 'none';
                 document.getElementById('pokedex').style.display = 'flex';
+                
+                // --- STEP 3 UPDATES ---
+                if (plusBtn) plusBtn.style.display = 'block'; // Show the plus button
+                document.getElementById('catch-container').style.display = 'none'; // Keep form hidden initially
+                
                 if (logoutBtn) logoutBtn.style.display = 'block';
                 if (leagueBtn) leagueBtn.style.display = 'block';
-                if (plusBtn) plusBtn.style.display = 'block'; // Show the + button
                 loadPokemon();
             } else {
                 document.getElementById('auth-container').style.display = 'block';
                 document.getElementById('pokedex').style.display = 'none';
+                
+                // Hide everything when logged out
+                if (plusBtn) plusBtn.style.display = 'none';
                 document.getElementById('catch-container').style.display = 'none';
                 if (logoutBtn) logoutBtn.style.display = 'none';
                 if (leagueBtn) leagueBtn.style.display = 'none';
-                if (plusBtn) plusBtn.style.display = 'none';
             }
         }
 
