@@ -34,9 +34,11 @@ app.get('/', (req, res) => {
 // --- POKEMON ROUTES ---
 
 // Search all pokemon
+// --- REPLACE IT WITH THIS ---
 app.get('/api/v1/pokemon', auth, async (req, res) => {
   try {
-    const allPokemon = await Pokemon.find();
+    // We add the filter { user: req.user.id } just like your search route has!
+    const allPokemon = await Pokemon.find({ user: req.user.id }); 
     res.json(allPokemon);
   } catch (err) {
     res.status(500).json({ message: err.message });
