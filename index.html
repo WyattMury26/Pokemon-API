@@ -31,129 +31,180 @@
 <body>
     <h1>🔥 My Pokémon Team 🔥</h1>
 
-   <div id="auth-container">
-    <div id="login-section">
-        <h2>Trainer Login</h2>
-        <input type="text" id="login-username" placeholder="Username">
-        <input type="password" id="login-password" placeholder="Password">
-        <button onclick="handleLogin()">Login</button>
-        <p>New trainer? <a href="#" onclick="toggleAuth(true)" style="color: #ffcb05;">Register here</a></p>
+    <button id="logout-btn" onclick="handleLogout()" style="display: none; position: absolute; top: 20px; right: 20px; background: #ef5350;">Logout</button>
+
+    <div id="auth-container">
+        <div id="login-section">
+            <h2>Trainer Login</h2>
+            <input type="text" id="login-username" placeholder="Username">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="handleLogin()">Login</button>
+            <p>New trainer? <a href="#" onclick="toggleAuth(true)" style="color: #ffcb05;">Register here</a></p>
+        </div>
+
+        <div id="register-section" style="display: none;">
+            <h2>New Trainer Registration</h2>
+            <input type="text" id="reg-username" placeholder="Choose Username">
+            <input type="password" id="reg-password" placeholder="Choose Password">
+            <button onclick="handleRegister()">Sign Up</button>
+            <p>Already have an account? <a href="#" onclick="toggleAuth(false)" style="color: #ffcb05;">Login here</a></p>
+        </div>
+        <p id="auth-error" style="color: #ef5350; font-size: 0.8em;"></p>
     </div>
 
-    <div id="register-section" style="display: none;">
-        <h2>New Trainer Registration</h2>
-        <input type="text" id="reg-username" placeholder="Choose Username">
-        <input type="password" id="reg-password" placeholder="Choose Password">
-        <button onclick="handleRegister()">Sign Up</button>
-        <p>Already have an account? <a href="#" onclick="toggleAuth(false)" style="color: #ffcb05;">Login here</a></p>
+    <div id="catch-container" style="display: none; background: #2d2d2d; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 15px; border: 2px solid #4caf50;">
+        <h3>Catch a New Pokémon</h3>
+        <input type="text" id="poke-name" placeholder="Pokémon Name">
+        <input type="text" id="poke-type" placeholder="Type (e.g. Fire)">
+        <input type="text" id="poke-sprite" placeholder="Sprite URL (Image Link)">
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <input type="number" id="poke-hp" placeholder="HP" style="width: 70px;">
+            <input type="number" id="poke-atk" placeholder="ATK" style="width: 70px;">
+        </div>
+        <button onclick="catchPokemon()" style="background: #4caf50; margin-top: 10px; color: white;">Add to Team</button>
+        <p id="catch-msg" style="font-size: 0.8em; margin-top: 10px;"></p>
     </div>
-    <p id="auth-error" style="color: #ef5350; font-size: 0.8em;"></p>
-</div>
 
     <div class="container" id="pokedex"></div>
 
     <script>
-       // Toggle between Login and Register views
-            function toggleAuth(showRegister) {
+        // TOGGLE: Switch between Login and Register
+        function toggleAuth(showRegister) {
             document.getElementById('login-section').style.display = showRegister ? 'none' : 'block';
             document.getElementById('register-section').style.display = showRegister ? 'block' : 'none';
             document.getElementById('auth-error').innerText = "";
         }
 
         // FUNCTION: Handle New User Registration
-            async function handleRegister() {
-                const username = document.getElementById('reg-username').value;
+        async function handleRegister() {
+            const username = document.getElementById('reg-username').value;
             const password = document.getElementById('reg-password').value;
             const errorDisplay = document.getElementById('auth-error');
 
             try {
                 const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                localStorage.setItem('token', data.token);
-                checkAuth();
-            } else {
-                errorDisplay.innerText = data.msg || "Registration failed";
-            }
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    checkAuth();
+                } else {
+                    errorDisplay.innerText = data.msg || "Registration failed";
+                }
             } catch (err) {
-            errorDisplay.innerText = "Error connecting to server.";
+                errorDisplay.innerText = "Error connecting to server.";
+            }
         }
-    }
 
         // FUNCTION: Handle the Login process
-            async function handleLogin() {
-                const username = document.getElementById('login-username').value;
-                const password = document.getElementById('login-password').value;
-                const errorDisplay = document.getElementById('auth-error'); // Fixed ID match
+        async function handleLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorDisplay = document.getElementById('auth-error');
 
-        try {
-            const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+            try {
+                const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token); 
+                    checkAuth(); 
+                } else {
+                    errorDisplay.innerText = data.msg || "Login Failed";
+                }
+            } catch (err) {
+                errorDisplay.innerText = "Connection error...";
+            }
+        }
+
+        // NEW FUNCTION: Catch a Pokémon (POST to API)
+        async function catchPokemon() {
+            const token = localStorage.getItem('token');
+            const name = document.getElementById('poke-name').value;
+            const type = document.getElementById('poke-type').value;
+            const sprite = document.getElementById('poke-sprite').value;
+            const hp = document.getElementById('poke-hp').value;
+            const attack = document.getElementById('poke-atk').value;
+            const msg = document.getElementById('catch-msg');
+
+            const newPoke = {
+                name: name,
+                types: [type],
+                sprite: sprite,
+                base_stats: { hp: parseInt(hp), attack: parseInt(attack) }
+            };
+
+            try {
+                const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-auth-token': token 
+                    },
+                    body: JSON.stringify(newPoke)
+                });
+
+                if (response.ok) {
+                    msg.style.color = "#4caf50";
+                    msg.innerText = `${name} added to your team!`;
+                    loadPokemon(); // Refresh cards
+                } else {
+                    msg.style.color = "#ef5350";
+                    msg.innerText = "Error adding Pokémon.";
+                }
+            } catch (err) {
+                msg.innerText = "Server error...";
+            }
+        }
+
+        // FUNCTION: Load the Pokémon cards
+        async function loadPokemon() {
+            const token = localStorage.getItem('token'); 
+            const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
+                headers: { 'x-auth-token': token }
             });
 
+            if (!response.ok) return;
             const data = await response.json();
+            const container = document.getElementById('pokedex');
+            container.innerHTML = ""; 
 
-            if (response.ok) {
-                localStorage.setItem('token', data.token); 
-                checkAuth(); 
-            } else {
-                errorDisplay.innerText = data.msg || "Login Failed";
-            }
-        } catch (err) {
-            errorDisplay.innerText = "Connection error...";
-        }
-    }
-
-    // FUNCTION: Load the Pokémon cards
-    async function loadPokemon() {
-        const token = localStorage.getItem('token'); 
-        const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
-            headers: { 'x-auth-token': token }
-        });
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const container = document.getElementById('pokedex');
-        container.innerHTML = ""; 
-
-        data.forEach(p => {
-            container.innerHTML += `
-                <div class="card">
-                    <img src="${p.sprite}" alt="${p.name}">
-                    <h2>${p.name}</h2>
-                    <p><span class="type">${p.types[0]}</span></p>
-                    <div class="stats">
-                        <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
+            data.forEach(p => {
+                container.innerHTML += `
+                    <div class="card">
+                        <img src="${p.sprite}" alt="${p.name}">
+                        <h2>${p.name}</h2>
+                        <p><span class="type">${p.types[0]}</span></p>
+                        <div class="stats">
+                            <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
-    }
-
-    // FUNCTION: Check if user is logged in on page load
-    function checkAuth() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('pokedex').style.display = 'flex';
-            loadPokemon();
-        } else {
-            document.getElementById('auth-container').style.display = 'block';
-            document.getElementById('pokedex').style.display = 'none';
+                `;
+            });
         }
-    }
 
-    // Run the check as soon as the page loads
-    checkAuth();
+        // FUNCTION: Check Auth and Toggle UI
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('pokedex').style.display = 'flex';
+                document.getElementById('catch-container').style.display = 'block'; // Show Form
+                loadPokemon();
+            } else {
+                document.getElementById('auth-container').style.display = 'block';
+                document.getElementById('pokedex').style.display = 'none';
+                document.getElementById('catch-container').style.display = 'none'; // Hide Form
+            }
+        }
+
+        checkAuth();
     </script>
 </body>
 </html>
