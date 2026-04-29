@@ -54,18 +54,21 @@
         <p id="auth-error" style="color: #ef5350; font-size: 0.8em;"></p>
     </div>
 
-    <div id="catch-container" style="display: none; background: #2d2d2d; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 15px; border: 2px solid #4caf50;">
-        <h3>Catch a New Pokémon</h3>
-        <input type="text" id="poke-name" placeholder="Pokémon Name">
-        <input type="text" id="poke-type" placeholder="Type (e.g. Fire)">
-        <input type="text" id="poke-sprite" placeholder="Sprite URL (Image Link)">
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <input type="number" id="poke-hp" placeholder="HP" style="width: 70px;">
-            <input type="number" id="poke-atk" placeholder="ATK" style="width: 70px;">
-        </div>
-        <button onclick="catchPokemon()" style="background: #4caf50; margin-top: 10px; color: white;">Add to Team</button>
-        <p id="catch-msg" style="font-size: 0.8em; margin-top: 10px;"></p>
+    <button id="toggle-catch-btn" onclick="toggleCatchForm()" style="display: none; background: #4caf50; margin: 20px auto; display: block; border-radius: 50px; width: 50px; height: 50px; font-size: 24px; color: white; cursor: pointer; border: none;">+</button>
+
+<div id="catch-container" style="display: none; background: #2d2d2d; max-width: 400px; margin: 10px auto; padding: 20px; border-radius: 15px; border: 2px solid #4caf50; position: relative;">
+    <button onclick="toggleCatchForm()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #aaa; cursor: pointer;">✕</button>
+    <h3>New Discovery</h3>
+    <input type="text" id="poke-name" placeholder="Pokémon Name">
+    <input type="text" id="poke-type" placeholder="Type (e.g. Fire)">
+    <input type="text" id="poke-sprite" placeholder="Sprite URL (Image Link)">
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <input type="number" id="poke-hp" placeholder="HP" style="width: 70px;">
+        <input type="number" id="poke-atk" placeholder="ATK" style="width: 70px;">
     </div>
+    <button onclick="catchPokemon()" style="background: #4caf50; margin-top: 10px; color: white;">Add to Team</button>
+    <p id="catch-msg" style="font-size: 0.8em; margin-top: 10px;"></p>
+</div>
 
     <div class="container" id="pokedex"></div>
 
