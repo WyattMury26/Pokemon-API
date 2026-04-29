@@ -100,15 +100,27 @@
         async function toggleLeagueView() {
             showingLeague = !showingLeague;
             const btn = document.getElementById('league-btn');
+            const plusBtn = document.getElementById('toggle-catch-btn');
+            const catchContainer = document.getElementById('catch-container');
+
             if (showingLeague) {
                 btn.innerText = "View My Team";
                 btn.style.background = "#4caf50";
                 btn.style.color = "white";
+                
+                // Hide the catch tools in League mode
+                if (plusBtn) plusBtn.style.display = 'none';
+                if (catchContainer) catchContainer.style.display = 'none';
+                
                 loadLeague();
             } else {
                 btn.innerText = "View Global League";
                 btn.style.background = "#ffcb05";
                 btn.style.color = "#1a1a1a";
+                
+                // Bring back the catch button for personal view
+                if (plusBtn) plusBtn.style.display = 'block';
+                
                 loadPokemon();
             }
         }
@@ -118,15 +130,14 @@
             const token = localStorage.getItem('token');
             const logoutBtn = document.getElementById('logout-btn');
             const leagueBtn = document.getElementById('league-btn');
-            const plusBtn = document.getElementById('toggle-catch-btn'); // Step 3: Define the button
+            const plusBtn = document.getElementById('toggle-catch-btn');
 
             if (token) {
                 document.getElementById('auth-container').style.display = 'none';
                 document.getElementById('pokedex').style.display = 'flex';
                 
-                // --- STEP 3 UPDATES ---
-                if (plusBtn) plusBtn.style.display = 'block'; // Show the plus button
-                document.getElementById('catch-container').style.display = 'none'; // Keep form hidden initially
+                if (plusBtn) plusBtn.style.display = 'block'; 
+                document.getElementById('catch-container').style.display = 'none'; 
                 
                 if (logoutBtn) logoutBtn.style.display = 'block';
                 if (leagueBtn) leagueBtn.style.display = 'block';
@@ -135,7 +146,6 @@
                 document.getElementById('auth-container').style.display = 'block';
                 document.getElementById('pokedex').style.display = 'none';
                 
-                // Hide everything when logged out
                 if (plusBtn) plusBtn.style.display = 'none';
                 document.getElementById('catch-container').style.display = 'none';
                 if (logoutBtn) logoutBtn.style.display = 'none';
@@ -207,7 +217,7 @@
                 if (response.ok) {
                     document.getElementById('catch-msg').innerText = "Added to team!";
                     loadPokemon();
-                    toggleCatchForm(); // Close form automatically after catching
+                    toggleCatchForm(); 
                 }
             } catch (err) { console.error(err); }
         }
