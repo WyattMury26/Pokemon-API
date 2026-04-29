@@ -194,24 +194,22 @@
 
        function checkAuth() {
     const token = localStorage.getItem('token');
-    const logoutBtn = document.getElementById('logout-btn'); // Get the button
-    
+    const logoutBtn = document.getElementById('logout-btn');
+    const leagueBtn = document.getElementById('league-btn');
+
     if (token) {
         document.getElementById('auth-container').style.display = 'none';
         document.getElementById('pokedex').style.display = 'flex';
         document.getElementById('catch-container').style.display = 'block';
-        
-        // Show the logout button if it exists
-        if (logoutBtn) logoutBtn.style.display = 'block'; 
-        
+        if (logoutBtn) logoutBtn.style.display = 'block';
+        if (leagueBtn) leagueBtn.style.display = 'block'; // Show League Button
         loadPokemon();
     } else {
         document.getElementById('auth-container').style.display = 'block';
         document.getElementById('pokedex').style.display = 'none';
         document.getElementById('catch-container').style.display = 'none';
-        
-        // Hide the logout button when logged out
-        if (logoutBtn) logoutBtn.style.display = 'none'; 
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (leagueBtn) leagueBtn.style.display = 'none'; // Hide League Button
     }
 }
 
