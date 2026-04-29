@@ -100,6 +100,25 @@ app.post('/api/v1/pokemon', auth, async (req, res) => {
     }
 });
 
+// --- DELETE A POKEMON (Release) ---
+app.delete('/api/v1/pokemon/:id', auth, async (req, res) => {
+    try {
+        // Find the pokemon by ID AND make sure it belongs to the logged-in user
+        const pokemon = await Pokemon.findOneAndDelete({ 
+            _id: req.params.id, 
+            user: req.user.id 
+        });
+
+        if (!pokemon) {
+            return res.status(404).json({ message: "Pokémon not found or unauthorized" });
+        }
+
+        res.json({ message: "Pokémon released successfully!" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // --- SERVER START ---
 app.listen(PORT, () => {
     console.log(`🚀 API is live at port ${PORT}`);
