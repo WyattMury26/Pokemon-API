@@ -206,6 +206,34 @@
         }
 
         checkAuth();
+
+        // FUNCTION: Logout
+function handleLogout() {
+    localStorage.removeItem('token'); // Destroy the VIP pass
+    checkAuth(); // Refresh UI
+}
+
+// FUNCTION: Delete Pokémon (Release)
+async function releasePokemon(id) {
+    const token = localStorage.getItem('token');
+    
+    if (!confirm("Are you sure you want to release this Pokémon?")) return;
+
+    try {
+        const response = await fetch(`https://pokemon-api-2llp.onrender.com/api/v1/pokemon/${id}`, {
+            method: 'DELETE',
+            headers: { 'x-auth-token': token }
+        });
+
+        if (response.ok) {
+            loadPokemon(); // Refresh the list
+        } else {
+            alert("Failed to release Pokémon.");
+        }
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
     </script>
 </body>
 </html>
