@@ -119,6 +119,17 @@ app.delete('/api/v1/pokemon/:id', auth, async (req, res) => {
     }
 });
 
+// --- GLOBAL LEAGUE ROUTE (Public) ---
+// Note: We don't use the 'auth' middleware here so anyone can see the league!
+app.get('/api/v1/league', async (req, res) => {
+    try {
+        const allPokemon = await Pokemon.find(); 
+        res.json(allPokemon);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // --- SERVER START ---
 app.listen(PORT, () => {
     console.log(`🚀 API is live at port ${PORT}`);
