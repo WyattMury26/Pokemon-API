@@ -190,20 +190,28 @@
 });
         }
 
-        // FUNCTION: Check Auth and Toggle UI
-        function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                document.getElementById('auth-container').style.display = 'none';
-                document.getElementById('pokedex').style.display = 'flex';
-                document.getElementById('catch-container').style.display = 'block'; // Show Form
-                loadPokemon();
-            } else {
-                document.getElementById('auth-container').style.display = 'block';
-                document.getElementById('pokedex').style.display = 'none';
-                document.getElementById('catch-container').style.display = 'none'; // Hide Form
-            }
-        }
+       function checkAuth() {
+    const token = localStorage.getItem('token');
+    const logoutBtn = document.getElementById('logout-btn'); // Get the button
+    
+    if (token) {
+        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('pokedex').style.display = 'flex';
+        document.getElementById('catch-container').style.display = 'block';
+        
+        // Show the logout button if it exists
+        if (logoutBtn) logoutBtn.style.display = 'block'; 
+        
+        loadPokemon();
+    } else {
+        document.getElementById('auth-container').style.display = 'block';
+        document.getElementById('pokedex').style.display = 'none';
+        document.getElementById('catch-container').style.display = 'none';
+        
+        // Hide the logout button when logged out
+        if (logoutBtn) logoutBtn.style.display = 'none'; 
+    }
+}
 
         checkAuth();
 
