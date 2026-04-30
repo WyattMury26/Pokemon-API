@@ -25,4 +25,26 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
+// @route   PUT api/v1/trades/:id/accept
+// @desc    Accept a trade and swap owners
+router.put('/:id/accept', auth, async (req, res) => {
+    try {
+        const trade = await Trade.findById(req.params.id);
+        if (!trade) return res.status(404).json({ msg: "Trade not found" });
+        if (trade.receiver.toString() !== req.user.id) return res.status(401).json({ msg: "Not authorized" });
+
+        // 1. Swap the 'user' field on both Pokemon documents
+        await Pokemon.findByIdAndUpdate(trade.offeredPokemon, { user: trade.receiver });
+        await Pokemon.findByIdAndUpdate(trade.wantedPokemon, { user: trade.sender });
+
+        // 2. Update trade status
+        trade.status = 'accepted';
+        await trade.save();
+
+        res.json({ msg: "Trade successful! Your teams have been updated." });
+    } catch (err) {
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;
