@@ -100,6 +100,18 @@
 
     <div class="container" id="pokedex"></div>
 
+    <!-- TRADE SELECTION MODAL -->
+<div id="trade-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto;">
+    <div style="background: #2d2d2d; max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 15px; border: 3px solid #ffcb05;">
+        <h2 style="color: #ffcb05;">Select Your Offer</h2>
+        <p>Which Pokémon will you trade for <span id="target-poke-name-display" style="color: #ef5350; font-weight: bold;"></span>?</p>
+        <div id="my-offer-list" class="container" style="padding: 10px;">
+            <!-- Your Pokémon will load here -->
+        </div>
+        <button onclick="closeTradeModal()" style="background: #ef5350; margin-top: 20px;">Cancel</button>
+    </div>
+</div>
+
     <script>
         // --- UI TOGGLES ---
         function toggleAuth(showRegister) {
@@ -324,15 +336,55 @@
             });
         }
 
-        async function initiateTrade(targetPokeId, targetPokeName) {
-            // Confirm the user wants to trade
-            const myOffer = confirm(`Do you want to offer one of your Pokémon for ${targetPokeName}?`);
-            
-            if (myOffer) {
-                alert("Trade System: This feature will soon open your team menu to select your offer!");
-                // Next step: Fetch 'My Team' so the user can choose what to give up.
-            }
-        }
+        let selectedTargetId = ""; // Stores the ID of the Pokémon you want
+
+async function initiateTrade(targetPokeId, targetPokeName) {
+    selectedTargetId = targetPokeId;
+    document.getElementById('target-poke-name-display').innerText = targetPokeName;
+    
+    const token = localStorage.getItem('token');
+    if (!token) return alert("You must be logged in to trade!");
+
+    // 1. Show the modal
+    document.getElementById('trade-modal').style.display = 'block';
+    const listContainer = document.getElementById('my-offer-list');
+    listContainer.innerHTML = "Loading your team...";
+
+    try {
+        // 2. Fetch your team
+        const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/pokemon', {
+            headers: { 'x-auth-token': token }
+        });
+        const myPokemon = await response.json();
+
+        // 3. Display your team as choices
+        listContainer.innerHTML = "";
+        myPokemon.forEach(p => {
+            listContainer.innerHTML += `
+                <div class="card" onclick="confirmTradeOffer('${p._id}', '${p.name}')" style="cursor:pointer; width: 150px; border-color: #4caf50;">
+                    <img src="${p.sprite}" alt="${p.name}" style="width: 80px; height: 80px;">
+                    <h4 style="margin: 5px 0;">${p.name}</h4>
+                    <small>Click to Offer</small>
+                </div>`;
+        });
+    } catch (err) {
+        listContainer.innerHTML = "Error loading your team.";
+    }
+}
+
+function closeTradeModal() {
+    document.getElementById('trade-modal').style.display = 'none';
+}
+
+async function confirmTradeOffer(myPokeId, myPokeName) {
+    const finalConfirm = confirm(`Offer your ${myPokeName} for the other trainer's Pokémon?`);
+    
+    if (finalConfirm) {
+        alert("Offer Saved! (Next step: We will connect this to the Database)");
+        // This is where we will eventually call the POST /api/v1/trades route
+        closeTradeModal();
+    }
+}
 
         async function releasePokemon(id) {
             const token = localStorage.getItem('token');
