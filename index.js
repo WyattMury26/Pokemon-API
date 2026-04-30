@@ -121,9 +121,13 @@ app.delete('/api/v1/pokemon/:id', auth, async (req, res) => {
 
 // --- GLOBAL LEAGUE ROUTE (Public) ---
 // Note: We don't use the 'auth' middleware here so anyone can see the league!
+// --- GLOBAL LEAGUE ROUTE (Public) ---
 app.get('/api/v1/league', async (req, res) => {
     try {
-        const allPokemon = await Pokemon.find(); 
+        // .populate('user', 'username') tells the DB to fetch the 
+        // username from the User collection based on the ID stored in the Pokemon
+        const allPokemon = await Pokemon.find().populate('user', 'username'); 
+        
         res.json(allPokemon);
     } catch (err) {
         res.status(500).json({ message: err.message });
