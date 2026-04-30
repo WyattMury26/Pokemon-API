@@ -31,6 +31,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+
+// --- GET TRAINER PROFILE ---
+app.get('/api/v1/trainers/:userId', async (req, res) => {
+    try {
+        // Find all pokemon belonging to the ID passed in the URL
+        const trainerPokemon = await Pokemon.find({ user: req.params.userId })
+            .populate('user', 'username'); 
+        
+        // If we found pokemon, the first one contains the trainer info
+        const username = trainerPokemon.length > 0 ? trainerPokemon[0].user.username : "Unknown Trainer";
+
+        res.json({
+            username: username,
+            team: trainerPokemon
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // --- POKEMON ROUTES ---
 
 // Search all pokemon
