@@ -166,9 +166,39 @@
 
         async function loadTradeInbox() {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/trades/inbox', {
-        headers: { 'x-auth-token': token }
-    });
+    if (!token) return;
+
+    try {
+        const response = await fetch('https://pokemon-api-2llp.onrender.com/api/v1/trades/inbox', {
+            headers: { 'x-auth-token': token }
+        });
+        const trades = await response.json();
+        
+        console.log("Trades received:", trades); // CHECK YOUR CONSOLE FOR THIS
+
+        const inbox = document.getElementById('trade-inbox');
+        const list = document.getElementById('trade-requests-list');
+        
+        if (trades && trades.length > 0) {
+            inbox.style.display = 'block'; // This makes the yellow box appear
+            list.innerHTML = "";
+            trades.forEach(t => {
+                list.innerHTML += `
+                    <div style="border-bottom: 1px solid #555; padding: 10px; margin-bottom: 10px;">
+                        <p><strong>${t.sender.username}</strong> wants your <b>${t.wantedPokemon.name}</b></p>
+                        <p>They are offering their <b>${t.offeredPokemon.name}</b></p>
+                        <button onclick="respondToTrade('${t._id}', 'accept')" style="background: #4caf50; color: white; margin-right: 10px;">Accept</button>
+                        <button onclick="respondToTrade('${t._id}', 'reject')" style="background: #ef5350; color: white;">Decline</button>
+                    </div>`;
+            });
+        } else {
+            inbox.style.display = 'none'; // Hides it if there are no trades
+            console.log("No pending trades found for this user.");
+        }
+    } catch (err) {
+        console.error("Error loading inbox:", err);
+    }
+}
     const trades = await response.json();
 
     const inbox = document.getElementById('trade-inbox');
