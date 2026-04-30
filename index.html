@@ -21,6 +21,7 @@
             background: #2d2d2d; border-radius: 20px; padding: 20px; width: 220px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: transform 0.3s;
             border: 2px solid #ef5350;
+            position: relative; /* Added for Trainer Label positioning */
         }
         .card:hover { transform: translateY(-10px); }
         .card img { width: 120px; height: 120px; background: #3d3d3d; border-radius: 50%; }
@@ -32,6 +33,16 @@
         #toggle-catch-btn {
             background: #4caf50; margin: 20px auto; border-radius: 50px; 
             width: 50px; height: 50px; font-size: 24px; color: white;
+        }
+
+        /* Trainer Section Styling */
+        .trainer-badge {
+            background: #3d3d3d;
+            margin-top: 15px;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #ffcb05;
+            font-size: 0.85em;
         }
     </style>
 </head>
@@ -107,18 +118,14 @@
                 btn.innerText = "View My Team";
                 btn.style.background = "#4caf50";
                 btn.style.color = "white";
-                
                 if (plusBtn) plusBtn.setAttribute("style", "display: none !important;");
                 if (catchContainer) catchContainer.style.display = 'none';
-                
                 loadLeague();
             } else {
                 btn.innerText = "View Global League";
                 btn.style.background = "#ffcb05";
                 btn.style.color = "#1a1a1a";
-                
                 if (plusBtn) plusBtn.setAttribute("style", "display: block; background: #4caf50; margin: 20px auto; border-radius: 50px; width: 50px; height: 50px; font-size: 24px; color: white; cursor: pointer; border: none;");
-                
                 loadPokemon();
             }
         }
@@ -133,19 +140,14 @@
             if (token) {
                 document.getElementById('auth-container').style.display = 'none';
                 document.getElementById('pokedex').style.display = 'flex';
-                
                 if (plusBtn) plusBtn.style.display = 'block'; 
-                document.getElementById('catch-container').style.display = 'none'; 
-                
                 if (logoutBtn) logoutBtn.style.display = 'block';
                 if (leagueBtn) leagueBtn.style.display = 'block';
                 loadPokemon();
             } else {
                 document.getElementById('auth-container').style.display = 'block';
                 document.getElementById('pokedex').style.display = 'none';
-                
                 if (plusBtn) plusBtn.style.display = 'none';
-                document.getElementById('catch-container').style.display = 'none';
                 if (logoutBtn) logoutBtn.style.display = 'none';
                 if (leagueBtn) leagueBtn.style.display = 'none';
             }
@@ -248,19 +250,32 @@
             const data = await response.json();
             const container = document.getElementById('pokedex');
             container.innerHTML = ""; 
+            
             data.forEach(p => {
-                // Determine if user is a string (ID) or an object (populated with username)
-                const trainerName = (p.user && p.user.username) ? p.user.username : "Unknown Trainer";
+                // Logic to identify the User as a Trainer
+                let trainerName = "Wild Pokémon";
+                
+                if (p.user && typeof p.user === 'object' && p.user.username) {
+                    // Case 1: Backend populated the name
+                    trainerName = p.user.username;
+                } else if (p.user && typeof p.user === 'string') {
+                    // Case 2: Backend sent just the ID string
+                    trainerName = `Trainer #${p.user.substring(0, 6)}`;
+                }
 
                 container.innerHTML += `
                     <div class="card" style="border-color: #ffcb05;">
                         <img src="${p.sprite}" alt="${p.name}">
                         <h2>${p.name}</h2>
-                        <p><span class="type" style="background: #ffcb05; color: black;">Global</span></p>
+                        <p><span class="type" style="background: #ffcb05; color: black;">Global League</span></p>
                         <div class="stats">
                             <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
                         </div>
-                        <p style="font-size: 0.8em; margin-top: 10px; color: #ffcb05; font-weight: bold;">Trainer: ${trainerName}</p>
+                        
+                        <!-- Trainer Section: This is where users show up as trainers -->
+                        <div class="trainer-badge">
+                            <span style="color: #ffcb05; font-weight: bold;">👤 Trainer:</span> ${trainerName}
+                        </div>
                     </div>`;
             });
         }
