@@ -16,7 +16,7 @@ app.use(cors()); // Allows your HTML to talk to the API
 app.use(express.json()); // Allows the server to read JSON
 app.use(express.static(__dirname)); // Serves your CSS/Images from the main folder
 app.use('/api/v1/auth', require('./routes/auth'));
-app.use('/api/v1/trades', require('./routes/trades'));
+app.use('/api/v1/trades', require('./routes/routes-trades'));
 
 // Define the Port (Important for Render!)
 const PORT = process.env.PORT || 10000;
