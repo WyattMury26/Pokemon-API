@@ -47,4 +47,19 @@ router.put('/:id/accept', auth, async (req, res) => {
     }
 });
 
+// @route   GET api/v1/trades/inbox
+// @desc    Get all pending trades for the logged-in user
+router.get('/inbox', auth, async (req, res) => {
+    try {
+        // Find trades where the logged-in user is the receiver
+        const trades = await Trade.find({ receiver: req.user.id, status: 'pending' })
+            .populate('sender', 'username')
+            .populate('offeredPokemon')
+            .populate('wantedPokemon');
+        res.json(trades);
+    } catch (err) {
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;
