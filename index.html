@@ -288,7 +288,7 @@
             const data = await response.json();
             
             const container = document.getElementById('pokedex');
-            document.getElementById('page-title').innerText = `✨ ${data.username}'s Profile ✨`;
+            document.getElementById('page-title').innerText = ` ${data.username}'s Profile `;
             
             container.innerHTML = `
                 <div style="width: 100%; margin-bottom: 20px;">
