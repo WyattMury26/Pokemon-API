@@ -46,6 +46,17 @@
             cursor: pointer;
         }
         .trainer-badge:hover { background: #444; }
+
+        /* Trade Button Style */
+        .trade-btn {
+            margin-top: 10px;
+            background: #ffcb05;
+            color: #1a1a1a;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        .trade-btn:hover { background: #f0c000; }
     </style>
 </head>
 <body>
@@ -305,8 +316,22 @@
                         <div class="stats">
                             <p>HP: ${p.base_stats.hp} | ATK: ${p.base_stats.attack}</p>
                         </div>
+                        <!-- --- ADDED TRADE BUTTON --- -->
+                        <button class="trade-btn" onclick="initiateTrade('${p._id}', '${p.name}')">
+                            Request Trade
+                        </button>
                     </div>`;
             });
+        }
+
+        async function initiateTrade(targetPokeId, targetPokeName) {
+            // Confirm the user wants to trade
+            const myOffer = confirm(`Do you want to offer one of your Pokémon for ${targetPokeName}?`);
+            
+            if (myOffer) {
+                alert("Trade System: This feature will soon open your team menu to select your offer!");
+                // Next step: Fetch 'My Team' so the user can choose what to give up.
+            }
         }
 
         async function releasePokemon(id) {
